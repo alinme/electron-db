@@ -3,6 +3,12 @@ const path = require('path');
 const fs = require('fs');
 const os = require('os');
 
+const getUniqueId = (min = 1000, max = 9999, substr = 6) => {
+    let rand = Math.round(Math.random() * (max - min) + min);
+    let date = new Date().getTime().toString().substring(substr);
+    return parseInt(date + rand);
+}
+
 var pack = null
 try {
     pack = require('../../package.json')
@@ -134,8 +140,7 @@ function insertTableContent() {
 
         // Checks if id was provided
         if(!tableRow['id']){
-            let date = new Date();
-            let id = date.getTime();
+            let id = getUniqueId();
             tableRow['id'] = id;
         }
 
@@ -690,7 +695,7 @@ module.exports = {
     insertTableContent,
     getAll,
     getRows,
-    updateRow,
+    upRow,
     search,
     deleteRow,
     valid,
