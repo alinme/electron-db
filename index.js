@@ -493,7 +493,6 @@ function updateRow() {
                     return;
                 }
 
-                callback(true, rows);
             } catch (e) {
                 callback(false, e.toString());
                 return;
@@ -695,7 +694,7 @@ module.exports = {
     insertTableContent,
     getAll,
     getRows,
-    upRow,
+    updateRow,
     search,
     deleteRow,
     valid,
