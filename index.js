@@ -13,7 +13,7 @@ var pack = null
 try {
     pack = require('../../package.json')
 } catch (e) {
-
+    console.log(e.message);
 }
 
 const platform = os.platform();
@@ -64,7 +64,7 @@ function createTable() {
         return;
     } else {
         // Create an empty object and pass an empty array as value
-        let obj = new Object();
+        let obj = {};
         obj[tableName] = [];
 
         // Write the object to json file
@@ -73,10 +73,8 @@ function createTable() {
 
             })
             callback(true, "Success!")
-            return;
         } catch (e) {
             callback(false, e.toString());
-            return;
         }
 
     }
@@ -87,12 +85,12 @@ function createTable() {
  */
 function valid() {
     var fName = ''
-    if (arguments.length == 2) {
+    if (arguments.length === 2) {
         // Given the database name and location
         const dbName = arguments[0]
         const dbLocation = arguments[1]
         fName = path.join(dbLocation, dbName + '.json')
-    } else if (arguments.length == 1) {
+    } else if (arguments.length === 1) {
         const dbName = arguments[0]
         fName = path.join(userData, dbName + '.json')
     }
@@ -140,26 +138,21 @@ function insertTableContent() {
 
         // Checks if id was provided
         if(!tableRow['id']){
-            let id = getUniqueId();
-            tableRow['id'] = id;
+            tableRow['id'] = getUniqueId();
         }
 
         table[tableName].push(tableRow);
 
         try {
-            fs.writeFileSync(fname, JSON.stringify(table, null, 2), (err) => {
-
-            })
+            fs.writeFileSync(fname, JSON.stringify(table, null, 2), (err) => { console.log(err.message) })
 
             callback(true, "Object written successfully!");
-            return id;
+            return tableRow['id'];
         } catch (e) {
             callback(false, "Error writing object.");
-            return;
         }
     }
     callback(false, "Table/json file doesn't exist!");
-    return;
 }
 
 /**
@@ -188,14 +181,11 @@ function getAll() {
         try {
             let table = JSON.parse(fs.readFileSync(fname));
             callback(true, table[tableName]);
-            return;
         } catch (e) {
             callback(false, []);
-            return;
         }
     } else {
         callback(false, 'Table file does not exist!');
-        return;
     }
 }
 
@@ -239,15 +229,12 @@ function getField() {
 
         if (!hasMatch) {
             callback(false, 'The key/field given does not exist.')
-            return
         }
 
         callback(true, data)
-        return
 
     } else {
         callback(false, 'The table you are trying to access does not exist.')
-        return
     }
 }
 
@@ -281,15 +268,12 @@ function clearTable() {
             fs.writeFileSync(fname, JSON.stringify(obj, null, 2), (err) => {
 
             })
-            callback(true, "Table cleared successfully!")
-            return;
+            callback(true, "Table cleared successfully!");
         } catch (e) {
             callback(false, e.toString());
-            return;
         }
     } else {
-        callback(false, 'The table you are trying to clear does not exist.')
-        return
+        callback(false, 'The table you are trying to clear does not exist.');
     }
 }
 
@@ -304,29 +288,12 @@ function count() {
     let callback
     if (arguments.length === 2) {
         callback = arguments[1]
-        getAll(tableName, (succ, data) => {
-            if (succ) {
-                callback(true, data.length)
-                return
-            } else {
-                callback(false, data)
-                return
-            }
-        })
+        getAll(tableName, (succ, data) => succ ? callback(true, data.length) : callback(false, data))
     } else if (arguments.length === 3) {
         callback = arguments[2]
-        getAll(tableName, arguments[1], (succ, data) => {
-            if (succ) {
-                callback(true, data.length)
-                return
-            } else {
-                callback(false, data)
-                return
-            }
-        })
+        getAll(tableName, arguments[1], (succ, data) => succ ? callback(true, data.length) : callback(false, data))
     } else {
         callback(false,'Wrong number of arguments. Must be either 2 or 3 arguments including callback function.')
-        return
     }
 }
 
@@ -620,7 +587,7 @@ function deleteRow() {
             let matchedIndices = [];
 
             for (let i = 0; i < rows.length; i++) {
-                // Iterate throught the rows
+                // Iterate through the rows
                 for (var j = 0; j < whereKeys.length; j++) {
                     // Test if there is a matched key with where clause and single row of table
                     if (rows[i].hasOwnProperty(whereKeys[j])) {
@@ -642,28 +609,22 @@ function deleteRow() {
             }
 
             // Create a new object and pass the rows
-            let obj = new Object();
+            let obj = {};
             obj[tableName] = rows;
 
             // Write the object to json file
             try {
-                fs.writeFileSync(fname, JSON.stringify(obj, null, 2), (err) => {
-
-                })
+                fs.writeFileSync(fname, JSON.stringify(obj, null, 2), (err) => {})
                 callback(true, "Row(s) deleted successfully!")
-                return;
             } catch (e) {
                 callback(false, e.toString());
-                return;
             }
 
         } else {
             callback(false, 'Table is empty!');
-            return;
         }
     } else {
         callback(false, 'Table file does not exist!');
-        return;
     }
 
 }
@@ -676,12 +637,12 @@ function deleteRow() {
  */
 function tableExists() {
     let fName = '';
-    if (arguments.length == 2) {
+    if (arguments.length === 2) {
         // Given the database name and location
         let dbName = arguments[0];
         let dbLocation = arguments[1];
         fName = path.join(dbLocation, dbName + '.json');
-    } else if (arguments.length == 1) {
+    } else if (arguments.length === 1) {
         let dbName = arguments[0];
         fName = path.join(userData, dbName + '.json');
     }
@@ -695,7 +656,7 @@ module.exports = {
     insertTableContent,
     getAll,
     getRows,
-    upRow,
+    updateRow,
     search,
     deleteRow,
     valid,
